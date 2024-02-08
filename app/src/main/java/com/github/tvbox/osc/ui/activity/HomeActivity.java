@@ -30,6 +30,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.viewpager.widget.ViewPager;
 
@@ -408,6 +409,9 @@ public class HomeActivity extends BaseActivity {
             } else {
                 LOG.e("无");
             }
+            if (Hawk.get(HawkConfig.HOME_DEFAULT_SHOW, false)) {
+                jumpActivity(LivePlayActivity.class);
+            }         
             return;
         }
         showLoading();
@@ -421,9 +425,6 @@ public class HomeActivity extends BaseActivity {
                             @Override
                             public void run() {
                                 if (!useCacheConfig) {
-                                    if (Hawk.get(HawkConfig.HOME_DEFAULT_SHOW, false)) {
-                                        jumpActivity(LivePlayActivity.class);
-                                   }
                                     Toast.makeText(HomeActivity.this, getString(R.string.hm_ok), Toast.LENGTH_SHORT).show();
                                 }
                                 initData();
@@ -802,14 +803,14 @@ public class HomeActivity extends BaseActivity {
 
             TvRecyclerView tvRecyclerView = dialog.findViewById(R.id.list);
             tvRecyclerView.setLayoutManager(new V7GridLayoutManager(dialog.getContext(), spanCount));
-            LinearLayout cl_root = dialog.findViewById(R.id.cl_root);
+            ConstraintLayout cl_root = dialog.findViewById(R.id.cl_root);
             ViewGroup.LayoutParams clp = cl_root.getLayoutParams();
             if (spanCount != 1) {
                 clp.width = AutoSizeUtils.mm2px(dialog.getContext(), 400 + 260 * (spanCount - 1));
             }
 
             dialog.setTip(getString(R.string.dia_source));
-            dialog.setAdapter(new SelectDialogAdapter.SelectDialogInterface<SourceBean>() {
+            dialog.setAdapter(tvRecyclerView, new SelectDialogAdapter.SelectDialogInterface<SourceBean>() {
                 @Override
                 public void click(SourceBean value, int pos) {
                     ApiConfig.get().setSourceBean(value);
